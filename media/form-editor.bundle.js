@@ -43295,9 +43295,9 @@
   }
   function snippet(template) {
     let snippet2 = Snippet.parse(template);
-    return (editor2, completion, from, to) => {
-      let { text: text2, ranges } = snippet2.instantiate(editor2.state, from);
-      let { main } = editor2.state.selection;
+    return (editor, completion, from, to) => {
+      let { text: text2, ranges } = snippet2.instantiate(editor.state, from);
+      let { main } = editor.state.selection;
       let spec = {
         changes: { from, to: to == main.from ? main.to : to, insert: Text.of(text2) },
         scrollIntoView: true,
@@ -43308,10 +43308,10 @@
       if (ranges.some((r3) => r3.field > 0)) {
         let active = new ActiveSnippet(ranges, 0);
         let effects = spec.effects = [setActive.of(active)];
-        if (editor2.state.field(snippetState, false) === void 0)
+        if (editor.state.field(snippetState, false) === void 0)
           effects.push(StateEffect.appendConfig.of([snippetState, addSnippetKeymap, snippetPointerHandler, baseTheme3]));
       }
-      editor2.dispatch(editor2.state.update(spec));
+      editor.dispatch(editor.state.update(spec));
     };
   }
   function moveField(dir) {
@@ -55799,7 +55799,7 @@ ${text2}</tr>
   function FormComponent(props) {
     const form = useService("form");
     const {
-      schema: schema2,
+      schema,
       properties
     } = form._getState();
     const {
@@ -55834,7 +55834,7 @@ ${text2}</tr>
       children: [u2(LocalExpressionContext.Provider, {
         value: localExpressionContext,
         children: u2(FormField, {
-          field: schema2,
+          field: schema,
           onChange
         })
       }), u2(PoweredBy, {})]
@@ -55886,7 +55886,7 @@ ${text2}</tr>
   };
   var EXPRESSION_PROPERTIES = ["alt", "appearance.prefixAdorner", "appearance.suffixAdorner", "conditional.hide", "description", "label", "source", "readonly", "text", "validate.min", "validate.max", "validate.minLength", "validate.maxLength", "valuesExpression", "url", "dataSource", "columnsExpression", "expression", "multiple", "accept", "title"];
   var TEMPLATE_PROPERTIES = ["alt", "appearance.prefixAdorner", "appearance.suffixAdorner", "description", "label", "source", "text", "content", "url", "title"];
-  function getSchemaVariables(schema2, options2 = {}) {
+  function getSchemaVariables(schema, options2 = {}) {
     const {
       formFields: formFields2 = new FormFields(),
       expressionLanguage: expressionLanguage2 = new FeelExpressionLanguage(null),
@@ -55894,7 +55894,7 @@ ${text2}</tr>
       inputs = true,
       outputs = true
     } = options2;
-    if (!schema2.components) {
+    if (!schema.components) {
       return [];
     }
     const getAllComponents = (node) => {
@@ -55907,7 +55907,7 @@ ${text2}</tr>
       }
       return components;
     };
-    const variables = getAllComponents(schema2).reduce((variables2, component) => {
+    const variables = getAllComponents(schema).reduce((variables2, component) => {
       const {
         valuesKey
       } = component;
@@ -55949,7 +55949,7 @@ ${text2}</tr>
       return bindingVariable;
     };
     if (inputs || outputs) {
-      variables.push(...getBindingVariables(schema2));
+      variables.push(...getBindingVariables(schema));
     }
     return Array.from(new Set(variables));
   }
@@ -57211,11 +57211,11 @@ ${text2}</tr>
      * @typedef {{ warnings: Error[], schema: any }} ImportResult
      * @returns {ImportResult}
      */
-    importSchema(schema2) {
+    importSchema(schema) {
       const warnings = [];
       try {
         this._cleanup();
-        const importedSchema = this.importFormField(clone4(schema2));
+        const importedSchema = this.importFormField(clone4(schema));
         this._formLayouter.calculateLayout(clone4(importedSchema));
         return {
           schema: importedSchema,
@@ -57844,9 +57844,9 @@ ${text2}</tr>
       }, [readOnly2]);
       const onReset = q2(() => form.reset(), []);
       const {
-        schema: schema2
+        schema
       } = state;
-      if (!schema2) {
+      if (!schema) {
         return null;
       }
       return u2(FormContext.Provider, {
@@ -61745,11 +61745,11 @@ ${text2}</tr>
           fieldType: type4
         } = event2.target.dataset;
         const {
-          schema: schema2
+          schema
         } = formEditor._getState();
         modeling.addFormField({
           type: type4
-        }, schema2, schema2.components.length);
+        }, schema, schema.components.length);
       }
     };
     return u2("button", {
@@ -62632,7 +62632,7 @@ ${text2}</tr>
   function FormEditor$1() {
     const dragging = useService$1("dragging"), eventBus = useService$1("eventBus"), formEditor = useService$1("formEditor"), injector = useService$1("injector"), selection2 = useService$1("selection"), propertiesPanel = useService$1("propertiesPanel"), propertiesPanelConfig = useService$1("config.propertiesPanel");
     const {
-      schema: schema2,
+      schema,
       properties
     } = formEditor._getState();
     const {
@@ -62640,20 +62640,20 @@ ${text2}</tr>
     } = properties;
     const formContainerRef = A2(null);
     const propertiesPanelRef = A2(null);
-    const [, setSelection] = d2(schema2);
+    const [, setSelection] = d2(schema);
     const [hasInitialized, setHasInitialized] = d2(false);
     y2(() => {
       function handleSelectionChanged(event2) {
-        setSelection(event2.selection || schema2);
+        setSelection(event2.selection || schema);
       }
       eventBus.on("selection.changed", handleSelectionChanged);
       return () => {
         eventBus.off("selection.changed", handleSelectionChanged);
       };
-    }, [eventBus, schema2]);
+    }, [eventBus, schema]);
     y2(() => {
-      setSelection(selection2.get() || schema2);
-    }, [selection2, schema2]);
+      setSelection(selection2.get() || schema);
+    }, [selection2, schema]);
     const [drake, setDrake] = d2(null);
     const dragAndDropContext = {
       drake
@@ -62729,7 +62729,7 @@ ${text2}</tr>
                   ariaLabel,
                   disabled: true
                 },
-                schema: schema2
+                schema
               };
             }
           };
@@ -62737,7 +62737,7 @@ ${text2}</tr>
         return injector.get(type3, strict);
       },
       formId: formEditor._id
-    }), [ariaLabel, formEditor, injector, schema2]);
+    }), [ariaLabel, formEditor, injector, schema]);
     const onSubmit = q2(() => {
     }, []);
     const onReset = q2(() => {
@@ -62888,9 +62888,9 @@ ${text2}</tr>
           setState(newState);
         });
         const {
-          schema: schema2
+          schema
         } = state;
-        if (!schema2) {
+        if (!schema) {
           return null;
         }
         return u2("div", {
@@ -63925,18 +63925,18 @@ ${text2}</tr>
       this.preExecute(["formField.add", "formField.remove", "formField.move", "id.updateClaim"], (event2) => this.updateRowIds(event2));
       eventBus.on("changed", (context) => {
         const {
-          schema: schema2
+          schema
         } = context;
-        this.updateLayout(schema2);
+        this.updateLayout(schema);
       });
     }
-    updateLayout(schema2) {
+    updateLayout(schema) {
       this._formLayouter.clear();
-      this._formLayouter.calculateLayout(clone4(schema2));
+      this._formLayouter.calculateLayout(clone4(schema));
     }
     updateRowIds(event2) {
       const {
-        schema: schema2
+        schema
       } = this._formEditor._getState();
       const setRowIds = (parent) => {
         if (!parent.components || !parent.components.length) {
@@ -63948,7 +63948,7 @@ ${text2}</tr>
           setRowIds(formField);
         });
       };
-      setRowIds(schema2);
+      setRowIds(schema);
     }
   };
   FormLayoutUpdater.$inject = ["eventBus", "formLayouter", "modeling", "formEditor"];
@@ -63969,15 +63969,15 @@ ${text2}</tr>
         targetIndex
       } = context;
       const {
-        schema: schema2
+        schema
       } = this._formEditor._getState();
       const targetPath = [...targetFormField._path, "components"];
       formField._parent = targetFormField.id;
-      arrayAdd$1(get(schema2, targetPath), targetIndex, formField);
-      get(schema2, targetPath).forEach((formField2, index2) => updatePath(this._formFieldRegistry, formField2, index2));
+      arrayAdd$1(get(schema, targetPath), targetIndex, formField);
+      get(schema, targetPath).forEach((formField2, index2) => updatePath(this._formFieldRegistry, formField2, index2));
       this._formFieldRegistry.add(formField);
       this._formEditor._setState({
-        schema: schema2
+        schema
       });
     }
     revert(context) {
@@ -63987,14 +63987,14 @@ ${text2}</tr>
         targetIndex
       } = context;
       const {
-        schema: schema2
+        schema
       } = this._formEditor._getState();
       const targetPath = [...targetFormField._path, "components"];
-      arrayRemove(get(schema2, targetPath), targetIndex);
-      get(schema2, targetPath).forEach((formField2, index2) => updatePath(this._formFieldRegistry, formField2, index2));
+      arrayRemove(get(schema, targetPath), targetIndex);
+      get(schema, targetPath).forEach((formField2, index2) => updatePath(this._formFieldRegistry, formField2, index2));
       this._formFieldRegistry.remove(formField);
       this._formEditor._setState({
-        schema: schema2
+        schema
       });
     }
   };
@@ -64015,7 +64015,7 @@ ${text2}</tr>
         properties
       } = context;
       let {
-        schema: schema2
+        schema
       } = this._formEditor._getState();
       const oldProperties = {};
       for (let key in properties) {
@@ -64031,7 +64031,7 @@ ${text2}</tr>
       }
       context.oldProperties = oldProperties;
       this._formEditor._setState({
-        schema: schema2
+        schema
       });
       return formField;
     }
@@ -64041,7 +64041,7 @@ ${text2}</tr>
         oldProperties
       } = context;
       let {
-        schema: schema2
+        schema
       } = this._formEditor._getState();
       for (let key in oldProperties) {
         const property = oldProperties[key];
@@ -64054,7 +64054,7 @@ ${text2}</tr>
         }
       }
       this._formEditor._setState({
-        schema: schema2
+        schema
       });
       return formField;
     }
@@ -64104,7 +64104,7 @@ ${text2}</tr>
         targetRow
       } = context;
       let {
-        schema: schema2
+        schema
       } = this._formEditor._getState();
       const sourcePath = [...sourceFormField._path, "components"];
       if (sourceFormField.id === targetFormField.id) {
@@ -64117,24 +64117,24 @@ ${text2}</tr>
             targetIndex--;
           }
         }
-        const formField = get(schema2, [...sourcePath, sourceIndex]);
+        const formField = get(schema, [...sourcePath, sourceIndex]);
         updateRow(formField, targetRow ? targetRow.id : this._formLayouter.nextRowId());
-        arrayMoveMutable(get(schema2, sourcePath), sourceIndex, targetIndex);
-        get(schema2, sourcePath).forEach((formField2, index2) => updatePath(this._formFieldRegistry, formField2, index2));
+        arrayMoveMutable(get(schema, sourcePath), sourceIndex, targetIndex);
+        get(schema, sourcePath).forEach((formField2, index2) => updatePath(this._formFieldRegistry, formField2, index2));
       } else {
-        const formField = get(schema2, [...sourcePath, sourceIndex]);
+        const formField = get(schema, [...sourcePath, sourceIndex]);
         this._pathRegistry.executeRecursivelyOnFields(formField, ({
           field
         }) => {
           this._pathRegistry.unclaimPath(this._pathRegistry.getValuePath(field));
         });
         formField._parent = targetFormField.id;
-        arrayRemove(get(schema2, sourcePath), sourceIndex);
-        get(schema2, sourcePath).forEach((formField2, index2) => updatePath(this._formFieldRegistry, formField2, index2));
+        arrayRemove(get(schema, sourcePath), sourceIndex);
+        get(schema, sourcePath).forEach((formField2, index2) => updatePath(this._formFieldRegistry, formField2, index2));
         const targetPath = [...targetFormField._path, "components"];
         updateRow(formField, targetRow ? targetRow.id : this._formLayouter.nextRowId());
-        arrayAdd$1(get(schema2, targetPath), targetIndex, formField);
-        get(schema2, targetPath).forEach((formField2, index2) => updatePath(this._formFieldRegistry, formField2, index2));
+        arrayAdd$1(get(schema, targetPath), targetIndex, formField);
+        get(schema, targetPath).forEach((formField2, index2) => updatePath(this._formFieldRegistry, formField2, index2));
         this._pathRegistry.executeRecursivelyOnFields(formField, ({
           field,
           isClosed,
@@ -64148,7 +64148,7 @@ ${text2}</tr>
         });
       }
       this._formEditor._setState({
-        schema: schema2
+        schema
       });
     }
   };
@@ -64169,15 +64169,15 @@ ${text2}</tr>
         sourceIndex
       } = context;
       let {
-        schema: schema2
+        schema
       } = this._formEditor._getState();
       const sourcePath = [...sourceFormField._path, "components"];
-      const formField = context.formField = get(schema2, [...sourcePath, sourceIndex]);
-      arrayRemove(get(schema2, sourcePath), sourceIndex);
-      get(schema2, sourcePath).forEach((formField2, index2) => updatePath(this._formFieldRegistry, formField2, index2));
+      const formField = context.formField = get(schema, [...sourcePath, sourceIndex]);
+      arrayRemove(get(schema, sourcePath), sourceIndex);
+      get(schema, sourcePath).forEach((formField2, index2) => updatePath(this._formFieldRegistry, formField2, index2));
       runRecursively(formField, (formField2) => this._formFieldRegistry.remove(formField2));
       this._formEditor._setState({
-        schema: schema2
+        schema
       });
     }
     revert(context) {
@@ -64187,14 +64187,14 @@ ${text2}</tr>
         sourceIndex
       } = context;
       let {
-        schema: schema2
+        schema
       } = this._formEditor._getState();
       const sourcePath = [...sourceFormField._path, "components"];
-      arrayAdd$1(get(schema2, sourcePath), sourceIndex, formField);
-      get(schema2, sourcePath).forEach((formField2, index2) => updatePath(this._formFieldRegistry, formField2, index2));
+      arrayAdd$1(get(schema, sourcePath), sourceIndex, formField);
+      get(schema, sourcePath).forEach((formField2, index2) => updatePath(this._formFieldRegistry, formField2, index2));
       runRecursively(formField, (formField2) => this._formFieldRegistry.add(formField2));
       this._formEditor._setState({
-        schema: schema2
+        schema
       });
     }
   };
@@ -65244,12 +65244,12 @@ ${text2}</tr>
   }
   var noop$6 = () => {
   };
-  var useBufferedFocus$1 = function(editor2, ref) {
+  var useBufferedFocus$1 = function(editor, ref) {
     const [buffer, setBuffer] = d2(void 0);
     ref.current = T2(() => ({
       focus: (offset2) => {
-        if (editor2) {
-          editor2.focus(offset2);
+        if (editor) {
+          editor.focus(offset2);
         } else {
           if (typeof offset2 === "undefined") {
             offset2 = Infinity;
@@ -65257,13 +65257,13 @@ ${text2}</tr>
           setBuffer(offset2);
         }
       }
-    }), [editor2]);
+    }), [editor]);
     y2(() => {
-      if (typeof buffer !== "undefined" && editor2) {
-        editor2.focus(buffer);
+      if (typeof buffer !== "undefined" && editor) {
+        editor.focus(buffer);
         setBuffer(false);
       }
-    }, [editor2, buffer]);
+    }, [editor, buffer]);
   };
   var CodeEditor$1 = D3((props, ref) => {
     const {
@@ -65280,16 +65280,16 @@ ${text2}</tr>
       singleLine = false
     } = props;
     const inputRef = A2();
-    const [editor2, setEditor] = d2();
+    const [editor, setEditor] = d2();
     const [localValue, setLocalValue] = d2(value || "");
-    useBufferedFocus$1(editor2, ref);
+    useBufferedFocus$1(editor, ref);
     const handleInput = useStaticCallback((newValue) => {
       onInput(newValue);
       setLocalValue(newValue);
     });
     y2(() => {
-      let editor3;
-      editor3 = new FeelersEditor({
+      let editor2;
+      editor2 = new FeelersEditor({
         container: inputRef.current,
         onChange: handleInput,
         value: localValue,
@@ -65301,7 +65301,7 @@ ${text2}</tr>
         singleLine,
         lineWrap: true
       });
-      setEditor(editor3);
+      setEditor(editor2);
       return () => {
         onLint([]);
         inputRef.current.innerHTML = "";
@@ -65309,13 +65309,13 @@ ${text2}</tr>
       };
     }, []);
     y2(() => {
-      if (!editor2) {
+      if (!editor) {
         return;
       }
       if (value === localValue) {
         return;
       }
-      editor2.setValue(value);
+      editor.setValue(value);
       setLocalValue(value);
     }, [value]);
     const handleClick = () => {
@@ -65342,12 +65342,12 @@ ${text2}</tr>
   });
   var noop$5 = () => {
   };
-  var useBufferedFocus = function(editor2, ref) {
+  var useBufferedFocus = function(editor, ref) {
     const [buffer, setBuffer] = d2(void 0);
     ref.current = T2(() => ({
       focus: (offset2) => {
-        if (editor2) {
-          editor2.focus(offset2);
+        if (editor) {
+          editor.focus(offset2);
         } else {
           if (typeof offset2 === "undefined") {
             offset2 = Infinity;
@@ -65355,13 +65355,13 @@ ${text2}</tr>
           setBuffer(offset2);
         }
       }
-    }), [editor2]);
+    }), [editor]);
     y2(() => {
-      if (typeof buffer !== "undefined" && editor2) {
-        editor2.focus(buffer);
+      if (typeof buffer !== "undefined" && editor) {
+        editor.focus(buffer);
         setBuffer(false);
       }
-    }, [editor2, buffer]);
+    }, [editor, buffer]);
   };
   var CodeEditor = D3((props, ref) => {
     const {
@@ -65379,26 +65379,26 @@ ${text2}</tr>
       variables
     } = props;
     const inputRef = A2();
-    const [editor2, setEditor] = d2();
+    const [editor, setEditor] = d2();
     const [localValue, setLocalValue] = d2(value || "");
-    useBufferedFocus(editor2, ref);
+    useBufferedFocus(editor, ref);
     const handleInput = useStaticCallback((newValue) => {
       onInput(newValue);
       setLocalValue(newValue);
     });
     y2(() => {
-      let editor3;
+      let editor2;
       const onKeyDown = (e3) => {
-        if (e3.key !== "Backspace" || !editor3) {
+        if (e3.key !== "Backspace" || !editor2) {
           return;
         }
-        const selection2 = editor3.getSelection();
+        const selection2 = editor2.getSelection();
         const range = selection2.ranges[selection2.mainIndex];
         if (range.from === 0 && range.to === 0) {
           onFeelToggle();
         }
       };
-      editor3 = new FeelEditor({
+      editor2 = new FeelEditor({
         container: inputRef.current,
         onChange: handleInput,
         onKeyDown,
@@ -65410,7 +65410,7 @@ ${text2}</tr>
         extensions: [...enableGutters ? [lineNumbers()] : [], EditorView.lineWrapping],
         contentAttributes: contentAttributes2
       });
-      setEditor(editor3);
+      setEditor(editor2);
       return () => {
         onLint([]);
         inputRef.current.innerHTML = "";
@@ -65418,26 +65418,26 @@ ${text2}</tr>
       };
     }, []);
     y2(() => {
-      if (!editor2) {
+      if (!editor) {
         return;
       }
       if (value === localValue) {
         return;
       }
-      editor2.setValue(value);
+      editor.setValue(value);
       setLocalValue(value);
     }, [value]);
     y2(() => {
-      if (!editor2) {
+      if (!editor) {
         return;
       }
-      editor2.setVariables(variables);
+      editor.setVariables(variables);
     }, [variables]);
     y2(() => {
-      if (!editor2) {
+      if (!editor) {
         return;
       }
-      editor2.setPlaceholder(placeholder2);
+      editor.setPlaceholder(placeholder2);
     }, [placeholder2]);
     const handleClick = () => {
       ref.current.focus();
@@ -67963,8 +67963,8 @@ ${text2}</tr>
   }
   function useVariables() {
     const form = useService2("formEditor");
-    const schema2 = form.getSchema();
-    return getSchemaVariables(schema2);
+    const schema = form.getSchema();
+    return getSchemaVariables(schema);
   }
   function AltTextEntry(props) {
     const {
@@ -70072,11 +70072,11 @@ ${text2}</tr>
     } = props;
     const debounce3 = useService2("debounce");
     const path2 = OPTIONS_SOURCES_PATHS[OPTIONS_SOURCES.INPUT];
-    const schema2 = '[\n  {\n    "label": "dollar",\n    "value": "$"\n  }\n]';
+    const schema = '[\n  {\n    "label": "dollar",\n    "value": "$"\n  }\n]';
     const tooltip = u2("div", {
       children: ["The input property may be an array of simple values or alternatively follow this schema:", u2("pre", {
         children: u2("code", {
-          children: schema2
+          children: schema
         })
       })]
     });
@@ -70464,11 +70464,11 @@ ${text2}</tr>
       name: name2
     }));
     const path2 = OPTIONS_SOURCES_PATHS[OPTIONS_SOURCES.EXPRESSION];
-    const schema2 = '[\n  {\n    "label": "dollar",\n    "value": "$"\n  }\n]';
+    const schema = '[\n  {\n    "label": "dollar",\n    "value": "$"\n  }\n]';
     const tooltip = u2("div", {
       children: ["The expression may result in an array of simple values or alternatively follow this schema:", u2("pre", {
         children: u2("code", {
-          children: schema2
+          children: schema
         })
       })]
     });
@@ -70768,11 +70768,11 @@ ${text2}</tr>
       }
       editField(field, PATH, value);
     };
-    const schema2 = '[\n  {\n    "key": "column_1",\n    "label": "Column 1"\n  }\n]';
+    const schema = '[\n  {\n    "key": "column_1",\n    "label": "Column 1"\n  }\n]';
     const tooltip = u2("div", {
       children: ["The expression may result in an array of simple values or alternatively follow this schema:", u2("pre", {
         children: u2("code", {
-          children: schema2
+          children: schema
         })
       })]
     });
@@ -71103,7 +71103,7 @@ ${text2}</tr>
     const setValue = (value) => {
       return editField(field, path2, value);
     };
-    const schema2 = `[
+    const schema = `[
   {
     "documentId": "u123",
     "endpoint": "https://api.example.com/documents/u123",
@@ -71122,7 +71122,7 @@ ${text2}</tr>
         children: "Additional details are optional. The expected format is as follows:"
       }), u2("pre", {
         children: u2("code", {
-          children: schema2
+          children: schema
         })
       }), u2("p", {
         children: "When using Camunda Tasklist UI, additional document reference attributes are automatically handled. Modifying the document reference may affect the document preview functionality."
@@ -72074,14 +72074,14 @@ ${text2}</tr>
      *
      * @return {Promise<{ warnings: Array<any> }>}
      */
-    importSchema(schema2) {
+    importSchema(schema) {
       return new Promise((resolve, reject) => {
         try {
           this.clear();
           const {
             schema: importedSchema,
             warnings
-          } = this.get("importer").importSchema(schema2);
+          } = this.get("importer").importSchema(schema);
           this._setState({
             schema: importedSchema
           });
@@ -72111,9 +72111,9 @@ ${text2}</tr>
      */
     getSchema() {
       const {
-        schema: schema2
+        schema
       } = this._getState();
-      return exportSchema(schema2, this.exporter, schemaVersion);
+      return exportSchema(schema, this.exporter, schemaVersion);
     }
     /**
      * @param {Element|string} parentNode
@@ -72228,11 +72228,11 @@ ${text2}</tr>
       this.get("eventBus").on(type3, priority, handler);
     }
   };
-  function exportSchema(schema2, exporter, schemaVersion2) {
+  function exportSchema(schema, exporter, schemaVersion2) {
     const exportDetails = exporter ? {
       exporter
     } : {};
-    const cleanedSchema = clone4(schema2, (name2, value) => {
+    const cleanedSchema = clone4(schema, (name2, value) => {
       if (["_parent", "_path"].includes(name2)) {
         return void 0;
       }
@@ -72246,51 +72246,53 @@ ${text2}</tr>
   }
 
   // src/webviews/formEditorWebview.ts
-  var schema = {
-    components: [
-      {
-        text: "Example\n",
-        type: "text",
-        layout: {
-          row: "Row_12tugsb",
-          columns: null
-        },
-        id: "Field_0sxtbxn"
-      },
-      {
-        label: "Number",
-        type: "number",
-        layout: {
-          row: "Row_01flj8p",
-          columns: null
-        },
-        id: "Field_1ftwcq0",
-        key: "number_978aj"
-      },
-      {
-        subtype: "date",
-        dateLabel: "Date",
-        type: "datetime",
-        layout: {
-          row: "Row_0rih328",
-          columns: null
-        },
-        id: "Field_07a291v",
-        key: "datetime_sw1j3a"
+  (function() {
+    let isUpdating = false;
+    const vscode = acquireVsCodeApi();
+    async function updateContent(text2) {
+      let json;
+      try {
+        if (!text2) {
+          text2 = "{}";
+        }
+        json = JSON.parse(text2);
+        window.formEditor.importSchema(json);
+      } catch {
+        return;
       }
-    ],
-    type: "default",
-    id: "Form_0k7zwsf",
-    exporter: {
-      name: "form-js (https://demo.bpmn.io)",
-      version: "1.14.0"
-    },
-    schemaVersion: 18
-  };
-  var editor = new FormEditor({
-    container: "#form-editor"
-  });
-  editor.importSchema(schema);
+      try {
+        await window.formEditor.importSchema(json);
+      } catch (err) {
+        console.log("importing form failed", err);
+      }
+    }
+    const editor = new FormEditor({
+      container: "#form-editor"
+    });
+    editor.on("changed", (event2) => {
+      const schema = editor.saveSchema();
+      vscode.postMessage({
+        type: "updateDocument",
+        data: schema
+      });
+    });
+    window.formEditor = editor;
+    window.addEventListener("message", (event2) => {
+      const message = event2.data;
+      switch (message.type) {
+        case "update":
+          isUpdating = true;
+          const text2 = message.text;
+          updateContent(text2);
+          vscode.setState({ text: text2 });
+          return;
+      }
+    });
+    const state = vscode.getState();
+    if (state) {
+      updateContent(state.text);
+    }
+  })();
 })();
 /*! Bundled license information:
 

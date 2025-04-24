@@ -26,52 +26,48 @@ export class FormEditorProvider implements vscode.CustomTextEditorProvider {
     webviewPanel: vscode.WebviewPanel,
     _token: vscode.CancellationToken
   ): Promise<void> {
-    console.log("setting up custom edirot");
-    // Setup initial content for the webview
     webviewPanel.webview.options = {
       enableScripts: true,
     };
-    console.log("getting html");
+
     webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview);
-    console.log(webviewPanel.webview.html);
+
     function updateWebview() {
-      //   webviewPanel.webview.postMessage({
-      //     type: "update",
-      //     text: document.getText(),
-      //   });
+      webviewPanel.webview.postMessage({
+        type: "update",
+        text: document.getText(),
+      });
     }
 
-    // Hook up event handlers so that we can synchronize the webview with the text document.
-    //
-    // The text document acts as our model, so we have to sync change in the document to our
-    // editor and sync changes in the editor back to the document.
-    //
-    // Remember that a single text document can also be shared between multiple custom
-    // editors (this happens for example when you split a custom editor)
+    // const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument(
+    //   (e) => {
+    //     if (e.document.uri.toString() === document.uri.toString()) {
+    //       updateWebview();
+    //     }
+    //   }
+    // );
 
-    const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument(
-      (e) => {
-        if (e.document.uri.toString() === document.uri.toString()) {
-          updateWebview();
-        }
-      }
-    );
-
-    // Make sure we get rid of the listener when our editor is closed.
-    webviewPanel.onDidDispose(() => {
-      changeDocumentSubscription.dispose();
-    });
+    // // Make sure we get rid of the listener when our editor is closed.
+    // webviewPanel.onDidDispose(() => {
+    //   changeDocumentSubscription.dispose();
+    // });
 
     // Receive message from the webview.
     webviewPanel.webview.onDidReceiveMessage((e) => {
-      //   switch (e.type) {
-      //     case "add":
-      //       this.addNewScratch(document);
-      //       return;
-      //     case "delete":
-      //       this.deleteScratch(document, e.id);
-      //       return;
-      //   }
+      if (e.type === "updateDocument") {
+        console.log("Recieved update");
+        const edit = new vscode.WorkspaceEdit();
+
+        // Just replace the entire document every time for this example extension.
+        // A more complete extension should compute minimal edits instead.
+        edit.replace(
+          document.uri,
+          new vscode.Range(0, 0, document.lineCount, 0),
+          JSON.stringify(e.data, null, 2)
+        );
+
+        return vscode.workspace.applyEdit(edit);
+      }
     });
 
     updateWebview();
@@ -139,6 +135,17 @@ export class FormEditorProvider implements vscode.CustomTextEditorProvider {
 			</html>`;
   }
 
+  async saveCustomDocument(
+    document: vscode.CustomDocument,
+    cancellation: vscode.CancellationToken
+  ): Promise<void> {
+    // This gets called whenever the user saves the document
+    console.log("User saved the document:", document.uri.toString());
+
+    // You are responsible for writing the contents to disk
+    // const data = this.getSerializedDocument(document);
+    // await vscode.workspace.fs.writeFile(document.uri, data);
+  }
   /**
    * Try to get a current document as json text.
    */
