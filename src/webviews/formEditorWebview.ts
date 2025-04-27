@@ -35,6 +35,7 @@ import { FormEditor } from "@bpmn-io/form-js-editor";
 
   editor.on("changed", (event: any) => {
     const schema = editor.saveSchema();
+    vscode.setState({ text: JSON.stringify(schema) });
     vscode.postMessage({
       type: "updateDocument",
       data: schema,
