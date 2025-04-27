@@ -1,6 +1,8 @@
 {
   "name": "form-modeler",
   "displayName": "Form Modeler",
+  "publisher": "michael-dratch",
+  "license": "MIT",
   "description": "Use the BPMN.io Form-JS modeler in vscode",
   "version": "0.0.1",
   "engines": {
